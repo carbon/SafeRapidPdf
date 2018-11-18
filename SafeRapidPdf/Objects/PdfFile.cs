@@ -33,11 +33,11 @@ namespace SafeRapidPdf.Objects
         }
 
         /// <summary>
-        /// Gets the parsing time in seconds
+        /// Gets the parsing time
         /// </summary>
-        public double ParsingTime { get; private set; }
+        public TimeSpan ParsingTime { get; private set; }
 
-        public string Version => Items.First().ToString();
+        public string Version => Items[0].ToString();
 
         public IReadOnlyList<IPdfObject> Items { get; private set; }
 
@@ -126,7 +126,7 @@ namespace SafeRapidPdf.Objects
 
             var file = new PdfFile(objects)
             {
-                ParsingTime = watch.Elapsed.TotalSeconds
+                ParsingTime = watch.Elapsed
             };
 
             // copy over xref
