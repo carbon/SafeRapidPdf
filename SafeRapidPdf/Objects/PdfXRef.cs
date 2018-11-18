@@ -5,7 +5,7 @@ namespace SafeRapidPdf.Objects
     public sealed class PdfXRef : PdfObject
     {
         private readonly IList<PdfXRefSection> _sections;
-        private readonly Dictionary<string, long> _offsets = new Dictionary<string, long>();
+        private readonly Dictionary<(int, int), long> _offsets = new Dictionary<(int, int), long>();
 
         private PdfXRef(IList<PdfXRefSection> sections)
             : base(PdfObjectType.XRef)
@@ -23,7 +23,7 @@ namespace SafeRapidPdf.Objects
 
                     if (entry.InUse)
                     {
-                        string key = BuildKey(entry.ObjectNumber, entry.GenerationNumber);
+                        (int, int) key = BuildKey(entry.ObjectNumber, entry.GenerationNumber);
                         _offsets.Add(key, entry.Offset);
                     }
                 }
@@ -79,13 +79,13 @@ namespace SafeRapidPdf.Objects
 
         public long GetOffset(int objectNumber, int generationNumber)
         {
-            string key = BuildKey(objectNumber, generationNumber);
+            var key = BuildKey(objectNumber, generationNumber);
             return _offsets[key];
         }
 
-        public static string BuildKey(int objectNumber, int generationNumber)
+        public static (int, int) BuildKey(int objectNumber, int generationNumber)
         {
-            return $"{objectNumber:0000000000}_{generationNumber:00000}";
+            return (objectNumber, generationNumber);
         }
 
         public override string ToString() => "xref";

@@ -17,15 +17,13 @@ namespace SafeRapidPdf.Objects
     /// </summary>
     public class PdfFile : IPdfObject, IIndirectReferenceResolver
     {
-        private readonly Dictionary<string, PdfIndirectObject> _indirectObjects;
+        private readonly Dictionary<(int, int), PdfIndirectObject> _indirectObjects = new Dictionary<(int, int), PdfIndirectObject>();
 
         private PdfFile(IReadOnlyList<IPdfObject> objects)
         {
             Items = objects;
 
             // build up the fast object lookup dictionary
-            _indirectObjects = new Dictionary<string, PdfIndirectObject>();
-
             foreach (var obj in Items.OfType<PdfIndirectObject>())
             {
                 InsertObject(obj);
@@ -150,13 +148,15 @@ namespace SafeRapidPdf.Objects
             if (obj is null)
                 throw new Exception("This object must be an indirect object");
 
-            string key = PdfXRef.BuildKey(obj.ObjectNumber, obj.GenerationNumber);
+            var key = PdfXRef.BuildKey(obj.ObjectNumber, obj.GenerationNumber);
+
             _indirectObjects[key] = obj;
         }
 
         public PdfIndirectObject GetObject(int objectNumber, int generationNumber)
         {
-            string key = PdfXRef.BuildKey(objectNumber, generationNumber);
+            var key = PdfXRef.BuildKey(objectNumber, generationNumber);
+
             return _indirectObjects[key];
         }
     }
