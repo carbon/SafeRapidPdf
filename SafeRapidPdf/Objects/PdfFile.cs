@@ -88,7 +88,7 @@ namespace SafeRapidPdf.Objects
 
             objects.Add(comment);
 
-            bool lastObjectWasOEF = false;
+            bool lastObjectWasEOF = false;
 
             while (true)
             {
@@ -96,7 +96,7 @@ namespace SafeRapidPdf.Objects
 
                 if (obj is null)
                 {
-                    if (lastObjectWasOEF)
+                    if (lastObjectWasEOF)
                     {
                         break;
                     }
@@ -110,15 +110,8 @@ namespace SafeRapidPdf.Objects
 
                 progress?.Invoke(null, new ProgressChangedEventArgs(lexer.Percentage, null));
 
-                lastObjectWasOEF = false;
-                if (obj is PdfComment cmt)
-                {
-                    if (cmt.IsEOF)
-                    {
-                        // a linearized or updated document might contain several EOF markers
-                        lastObjectWasOEF = true;
-                    }
-                }
+                // a linearized or updated document might contain several EOF markers
+                lastObjectWasEOF = obj is PdfComment cmt && cmt.IsEOF;
             }
 
             progress?.Invoke(null, new ProgressChangedEventArgs(100, null));
